@@ -1,6 +1,6 @@
 package com.chaney.limiters.controller;
 
-import com.chaney.limiters.Service.AccessLimitService;
+import com.chaney.limiters.service.AccessLimitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ public class TestLimitController {
     @Autowired
     private AccessLimitService accessLimitService;
 
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
     @RequestMapping("/rateLimiter")
     @ResponseBody
@@ -31,8 +31,9 @@ public class TestLimitController {
     @RequestMapping("/counter")
     @ResponseBody
     public String counter() {
-
-        return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
+        if (accessLimitService.countAcquire()) {
+            return "Success! " + Thread.currentThread().getName() + " " + df.format(new Date());
+        } else return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
     }
 
 
