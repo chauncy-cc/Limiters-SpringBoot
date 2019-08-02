@@ -10,17 +10,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Controller
-public class TestLimitController {
+public class AccessLimitController {
 
     @Autowired
     private AccessLimitService accessLimitService;
 
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+    private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
     @RequestMapping("/rateLimiter")
     @ResponseBody
     public String rateLimiter() {
         if (accessLimitService.rateLimiterTryAcquire()) {
+            // 业务逻辑
             return "Success! " + Thread.currentThread().getName() + " " + df.format(new Date());
         } else {
             return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
@@ -32,6 +33,7 @@ public class TestLimitController {
     @ResponseBody
     public String counter() {
         if (accessLimitService.countAcquire()) {
+            // 业务逻辑
             return "Success! " + Thread.currentThread().getName() + " " + df.format(new Date());
         } else return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
     }

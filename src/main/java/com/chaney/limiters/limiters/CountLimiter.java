@@ -3,6 +3,7 @@ package com.chaney.limiters.limiters;
 import java.util.Timer;
 import java.util.TimerTask;
 
+// 计数器限流算法
 public class CountLimiter {
 
     private final long msec;

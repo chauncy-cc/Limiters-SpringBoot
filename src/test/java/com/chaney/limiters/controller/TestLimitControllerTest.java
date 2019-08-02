@@ -6,14 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class TestLimitControllerTest {
 
     @Autowired
-    TestLimitController testLimitController;
+    AccessLimitController accessLimitController;
 
     @Test
     public void rateLimiter() throws InterruptedException {
@@ -21,7 +19,7 @@ public class TestLimitControllerTest {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    System.out.println(testLimitController.rateLimiter());
+                    System.out.println(accessLimitController.rateLimiter());
                 }
             }).start();
             Thread.sleep(100);
@@ -34,7 +32,7 @@ public class TestLimitControllerTest {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    System.out.println(testLimitController.counter());
+                    System.out.println(accessLimitController.counter());
                 }
             }).start();
             Thread.sleep(100);
