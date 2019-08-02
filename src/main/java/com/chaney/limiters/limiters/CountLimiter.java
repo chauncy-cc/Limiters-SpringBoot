@@ -2,28 +2,23 @@ package com.chaney.limiters.limiters;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
-// 计数器限流算法
+/**
+ * 计数器限流算法
+ */
 public class CountLimiter {
 
-    private final long msec;
-    private long remainSec;
-    private final int count;     // 先用int，应该会发生超出负载
-    private int remainCount;
+    private final long msec;                            // 每过msec毫秒重置remainCount
+    private final int count;                            // msec毫秒的周期内允许处理count个请求
+    private AtomicInteger remainCount;                  // msec毫秒的周期内还能处理remainCount个请求
+    private boolean running;
 
     private CountLimiter(long msec, int count) {
         this.msec = msec;
         this.count = count;
-        this.remainSec = msec;
-        this.remainCount = count;
-
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                remainCount = count;
-            }
-        }, 0, msec);
+        this.remainCount = new AtomicInteger(count);
+        this.running = false;
     }
 
     public static CountLimiter create(long msec, int count) {
@@ -31,11 +26,23 @@ public class CountLimiter {
     }
 
     public boolean acquire() {
-        if (remainCount > 0) {
-            remainCount--;
+        if (!this.running) startRun();
+        if (remainCount.get() > 0) {
+            remainCount.decrementAndGet();
             return true;
         }  else {
             return false;
         }
+    }
+
+    private void startRun() {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                remainCount.set(count);
+            }
+        }, 0, msec);
+        this.running = true;
     }
 }

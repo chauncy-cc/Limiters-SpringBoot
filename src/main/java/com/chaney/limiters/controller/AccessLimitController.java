@@ -20,7 +20,7 @@ public class AccessLimitController {
     @RequestMapping("/rateLimiter")
     @ResponseBody
     public String rateLimiter() {
-        if (accessLimitService.rateLimiterTryAcquire()) {
+        if (accessLimitService.rateLimiterAcquire()) {
             // 业务逻辑
             return "Success! " + Thread.currentThread().getName() + " " + df.format(new Date());
         } else {
@@ -42,7 +42,6 @@ public class AccessLimitController {
     @RequestMapping("/bucket")
     @ResponseBody
     public String bucket() {
-
         return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
     }
 
