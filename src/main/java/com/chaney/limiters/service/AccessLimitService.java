@@ -14,7 +14,7 @@ public class AccessLimitService {
     // 计数器实例
     private CountLimiter countLimiter = CountLimiter.create(1000, 5);
     // 漏桶实例
-    private LeakyBucketLimiter leakyBucketLimiter = LeakyBucketLimiter.create(50, 5);
+    private LeakyBucketLimiter leakyBucketLimiter = LeakyBucketLimiter.create(6, 5);
     // 令牌桶实例
     private RateLimiter rateLimiter = RateLimiter.create(5);
 
@@ -26,8 +26,7 @@ public class AccessLimitService {
 
     // 漏桶算法
     public boolean budgetAcquire() {
-        // return leakyBucketLimiter.aquire();
-        return false;
+        return leakyBucketLimiter.acquire();
     }
 
     // 计算器算法

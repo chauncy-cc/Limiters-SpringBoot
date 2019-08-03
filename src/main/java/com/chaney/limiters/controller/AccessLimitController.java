@@ -21,28 +21,28 @@ public class AccessLimitController {
     @ResponseBody
     public String rateLimiter() {
         if (accessLimitService.rateLimiterAcquire()) {
-            // 业务逻辑
+            // （业务逻辑）
             return "Success! " + Thread.currentThread().getName() + " " + df.format(new Date());
         } else {
             return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
         }
     }
 
-
     @RequestMapping("/counter")
     @ResponseBody
     public String counter() {
         if (accessLimitService.countAcquire()) {
-            // 业务逻辑
+            // （业务逻辑）
             return "Success! " + Thread.currentThread().getName() + " " + df.format(new Date());
         } else return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
     }
 
-
     @RequestMapping("/bucket")
     @ResponseBody
     public String bucket() {
-        return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
+        if (!accessLimitService.budgetAcquire()) {
+            return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
+        }  return "入队！" + Thread.currentThread().getName() + " " + df.format(new Date());
     }
 
 }

@@ -2,6 +2,8 @@ package com.chaney.limiters.limiters;
 
 import com.sun.org.apache.xpath.internal.operations.String;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -15,6 +17,7 @@ public class LeakyBucketLimiter {
     private final int capacity;                     // 漏斗容量
     private LinkedBlockingQueue<Integer> queue;     // 生产消费者队列
     private boolean isRunning = false;              // 是否开始运行不断处理请求的线程
+    private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
     private LeakyBucketLimiter(int capacity, int outRate) {
         this.capacity = capacity;
@@ -32,29 +35,28 @@ public class LeakyBucketLimiter {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (int i = 0; i < outRate; i++) {
-                    try {
-                        int requestIndex = queue.take();    // 阻塞取头部
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    int requestIndex = queue.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                System.out.println("success！" + Thread.currentThread().getName() + " " + df.format(new Date()));
             }
-        }, 0, 1000);
+        }, 0, 1000/outRate);
         this.isRunning = true;
     }
-
 
     // 放入队列等待处理
     public boolean acquire() {
         if (!isRunning) startRunning();
         if (queue.size() < capacity) {
             try {
-                queue.put(new Integer(1));
+                queue.put(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        } else {
+            return false;
         }
         return true;
     }

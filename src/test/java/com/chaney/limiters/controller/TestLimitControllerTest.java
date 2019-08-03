@@ -40,6 +40,15 @@ public class TestLimitControllerTest {
     }
 
     @Test
-    public void bucket() {
+    public void bucket() throws InterruptedException {
+        for (int i= 0; i<20; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println(accessLimitController.bucket());
+                }
+            }).start();
+            Thread.sleep(100);
+        }
     }
 }
