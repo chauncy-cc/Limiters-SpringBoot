@@ -15,34 +15,32 @@ public class AccessLimitController {
     @Autowired
     private AccessLimitService accessLimitService;
 
-    private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-
     @RequestMapping("/rateLimiter")
     @ResponseBody
-    public String rateLimiter() {
+    public boolean rateLimiter() {
         if (accessLimitService.rateLimiterAcquire()) {
             // （业务逻辑）
-            return "Success! " + Thread.currentThread().getName() + " " + df.format(new Date());
-        } else {
-            return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
+            return true;
         }
+        return false;
     }
 
     @RequestMapping("/counter")
     @ResponseBody
-    public String counter() {
+    public boolean counter() {
         if (accessLimitService.countAcquire()) {
             // （业务逻辑）
-            return "Success! " + Thread.currentThread().getName() + " " + df.format(new Date());
-        } else return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
+            return true;
+        }
+        return false;
     }
 
-    @RequestMapping("/bucket")
-    @ResponseBody
-    public String bucket() {
-        if (!accessLimitService.budgetAcquire()) {
-            return "Fail! " + Thread.currentThread().getName() + " " + df.format(new Date());
-        }  return "入队！" + Thread.currentThread().getName() + " " + df.format(new Date());
-    }
+//    @RequestMapping("/bucket")
+//    @ResponseBody
+//    public boolean bucket() {
+//        if (accessLimitService.budgetAcquire()) {
+//
+//        }
+//    }
 
 }

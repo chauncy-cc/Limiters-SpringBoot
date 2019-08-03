@@ -37,6 +37,7 @@ public class LeakyBucketLimiter {
             public void run() {
                 try {
                     int requestIndex = queue.take();
+                    // 可以根据requestIndex选择对应的业务逻辑来处理。应该可以autowired进来一个service
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

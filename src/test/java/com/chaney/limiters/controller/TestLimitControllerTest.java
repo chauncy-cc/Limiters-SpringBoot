@@ -45,7 +45,7 @@ public class TestLimitControllerTest {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    System.out.println(accessLimitController.bucket());
+                    //System.out.println(accessLimitController.bucket());
                 }
             }).start();
             Thread.sleep(100);
