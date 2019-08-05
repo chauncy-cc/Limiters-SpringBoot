@@ -1,5 +1,7 @@
 package com.chaney.limiters.controller;
 
+import com.chaney.limiters.enums.LimiterEnum;
+import com.chaney.limiters.limiters.AccessLimit;
 import com.chaney.limiters.result.CodeMsg;
 import com.chaney.limiters.result.Result;
 import com.chaney.limiters.service.AccessLimitService;
@@ -17,18 +19,9 @@ public class AccessLimitController {
     @Autowired
     private AccessLimitService accessLimitService;
 
-    @RequestMapping("/rateLimiter")
-    @ResponseBody
-    public Result rateLimiter() {
-        if (accessLimitService.rateLimiterAcquire()) {
-            // （业务逻辑）
-            return new Result(CodeMsg.ACQUIRE_SUCCESS);
-        }
-        return new Result(CodeMsg.ACQUIRE_LIMITED);
-    }
-
     @RequestMapping("/counter")
     @ResponseBody
+    @AccessLimit(qps = 10, limiterEnum = LimiterEnum.COUNT_LIMITER)
     public Result counter() {
         if (accessLimitService.countAcquire()) {
             // （业务逻辑）
@@ -39,6 +32,7 @@ public class AccessLimitController {
 
     @RequestMapping("/bucket")
     @ResponseBody
+    @AccessLimit(qps = 10, limiterEnum = LimiterEnum.LEAKY_BUCKET_LIMITER)
     public Result bucket() {
         if (accessLimitService.budgetLimiterAcquire()) {
             // (业务逻辑)
@@ -47,4 +41,14 @@ public class AccessLimitController {
         return new Result(CodeMsg.ACQUIRE_LIMITED);
     }
 
+    @RequestMapping("/rateLimiter")
+    @ResponseBody
+    @AccessLimit(qps = 10, limiterEnum = LimiterEnum.MYRATE_LIMITER)
+    public Result rateLimiter() {
+        if (accessLimitService.rateLimiterAcquire()) {
+            // （业务逻辑）
+            return new Result(CodeMsg.ACQUIRE_SUCCESS);
+        }
+        return new Result(CodeMsg.ACQUIRE_LIMITED);
+    }
 }
