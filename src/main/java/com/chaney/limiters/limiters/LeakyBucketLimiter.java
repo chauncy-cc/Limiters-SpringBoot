@@ -11,54 +11,32 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * 漏桶限流算法
  */
-public class LeakyBucketLimiter {
+public class LeakyBucketLimiter extends Limiter {
 
-    private final int outRate;                      // 每秒处理outRate个请求
-    private final int capacity;                     // 漏斗容量
-    private LinkedBlockingQueue<Integer> queue;     // 生产消费者队列
-    private boolean isRunning = false;              // 是否开始运行不断处理请求的线程
-    private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+    private final long capacity;                                    // 水桶容量, 一秒流光
+    private long remaining;                                         // 目前水桶剩下的水量
+    private long lastTime;                                          // 时间戳
 
-    private LeakyBucketLimiter(int capacity, int outRate) {
-        this.capacity = capacity;
-        this.outRate = outRate;
-        this.queue = new LinkedBlockingQueue<>(capacity);
+    LeakyBucketLimiter(int qps) {
+        super(qps);
+        capacity = qps;
+        remaining = capacity;
+        lastTime = 0;
     }
 
-    public static LeakyBucketLimiter create(int capacity, int outRate) {
-        return new LeakyBucketLimiter(capacity, outRate);
-    }
-
-    private void startRunning() {
-        // 1秒钟要处理请求
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    int requestIndex = queue.take();
-                    // 可以根据requestIndex选择对应的业务逻辑来处理。应该可以autowired进来一个service
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("success！" + Thread.currentThread().getName() + " " + df.format(new Date()));
-            }
-        }, 0, 1000/outRate);
-        this.isRunning = true;
-    }
-
-    // 放入队列等待处理
-    public boolean acquire() {
-        if (!isRunning) startRunning();
-        if (queue.size() < capacity) {
-            try {
-                queue.put(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    @Override
+    protected boolean tryAcquire() {
+        long now = System.currentTimeMillis();
+        long outWater = ((now - lastTime)/1000)*capacity;           // 计算这段时间匀速流出的水
+        if (outWater > remaining) {
+            remaining = 1;
+            return true;
         } else {
-            return false;
+            remaining -= outWater;
+            if (remaining + 1 < capacity) {
+                remaining += 1;
+                return true;
+            } else return false;
         }
-        return true;
     }
 }
