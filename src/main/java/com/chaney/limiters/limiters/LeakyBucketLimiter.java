@@ -14,27 +14,27 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class LeakyBucketLimiter extends Limiter {
 
     private final long capacity;                                    // 水桶容量, 一秒流光
-    private long remaining;                                         // 目前水桶剩下的水量
+    private double remainWater;                                         // 目前水桶剩下的水量
     private long lastTime;                                          // 时间戳
 
     LeakyBucketLimiter(int qps) {
         super(qps);
         capacity = qps;
-        remaining = capacity;
+        remainWater = capacity;
         lastTime = 0;
     }
 
     @Override
     protected boolean tryAcquire() {
         long now = System.currentTimeMillis();
-        long outWater = ((now - lastTime)/1000)*capacity;           // 计算这段时间匀速流出的水
-        if (outWater > remaining) {
-            remaining = 1;
+        double outWater = ((now - lastTime)/1000.0)*capacity;           // 计算这段时间匀速流出的水
+        if (outWater > remainWater) {
+            remainWater = 1;
             return true;
         } else {
-            remaining -= outWater;
-            if (remaining + 1 < capacity) {
-                remaining += 1;
+            remainWater -= outWater;
+            if (remainWater + 1 < capacity) {
+                remainWater += 1;
                 return true;
             } else return false;
         }
