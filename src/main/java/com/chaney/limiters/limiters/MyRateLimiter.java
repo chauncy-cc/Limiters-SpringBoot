@@ -17,13 +17,16 @@ public class MyRateLimiter extends Limiter {
     }
 
     @Override
-    protected boolean tryAcquire() {
+    protected synchronized boolean tryAcquire() {
         long now = System.currentTimeMillis();
         int intoToken = (int)((now - lastTime)/1000.0 * capacity);
+        lastTime = now;
         if (intoToken + curTokenNum > capacity) {
+            // 令牌已放满
             curTokenNum = capacity - 1;
             return true;
         } else if (intoToken + curTokenNum >= 1) {
+            // 还有令牌
             curTokenNum = intoToken + curTokenNum - 1;
             return true;
         } else return false;

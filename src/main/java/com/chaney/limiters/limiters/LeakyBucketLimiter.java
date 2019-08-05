@@ -25,15 +25,18 @@ public class LeakyBucketLimiter extends Limiter {
     }
 
     @Override
-    protected boolean tryAcquire() {
+    protected synchronized boolean tryAcquire() {
         long now = System.currentTimeMillis();
         double outWater = ((now - lastTime)/1000.0)*capacity;           // 计算这段时间匀速流出的水
+        lastTime = now;
         if (outWater > remainWater) {
+            // 请求已全部处理完毕
             remainWater = 1;
             return true;
         } else {
+            // 还有未处理的请求
             remainWater -= outWater;
-            if (remainWater + 1 < capacity) {
+            if (remainWater + 1 <= capacity) {
                 remainWater += 1;
                 return true;
             } else return false;
