@@ -9,6 +9,6 @@ public abstract class Limiter {
     }
 
     // 获取继续执行的资格（非阻塞）立刻返回成功失败
-    protected abstract boolean tryAcquire();
+    public abstract boolean tryAcquire();
 
 }

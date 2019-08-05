@@ -17,7 +17,7 @@ public class MyRateLimiter extends Limiter {
     }
 
     @Override
-    protected synchronized boolean tryAcquire() {
+    public synchronized boolean tryAcquire() {
         long now = System.currentTimeMillis();
         int intoToken = (int)((now - lastTime)/1000.0 * capacity);
         lastTime = now;

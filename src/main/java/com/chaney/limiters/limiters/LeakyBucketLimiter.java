@@ -25,7 +25,7 @@ public class LeakyBucketLimiter extends Limiter {
     }
 
     @Override
-    protected synchronized boolean tryAcquire() {
+    public synchronized boolean tryAcquire() {
         long now = System.currentTimeMillis();
         double outWater = ((now - lastTime)/1000.0)*capacity;           // 计算这段时间匀速流出的水
         lastTime = now;

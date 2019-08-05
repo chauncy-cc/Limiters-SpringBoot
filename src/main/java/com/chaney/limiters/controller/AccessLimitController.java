@@ -1,5 +1,7 @@
 package com.chaney.limiters.controller;
 
+import com.chaney.limiters.result.CodeMsg;
+import com.chaney.limiters.result.Result;
 import com.chaney.limiters.service.AccessLimitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,30 +19,32 @@ public class AccessLimitController {
 
     @RequestMapping("/rateLimiter")
     @ResponseBody
-    public boolean rateLimiter() {
+    public Result rateLimiter() {
         if (accessLimitService.rateLimiterAcquire()) {
             // （业务逻辑）
-            return true;
+            return new Result(CodeMsg.ACQUIRE_SUCCESS);
         }
-        return false;
+        return new Result(CodeMsg.ACQUIRE_LIMITED);
     }
 
     @RequestMapping("/counter")
     @ResponseBody
-    public boolean counter() {
+    public Result counter() {
         if (accessLimitService.countAcquire()) {
             // （业务逻辑）
-            return true;
+            return new Result(CodeMsg.ACQUIRE_SUCCESS);
         }
-        return false;
+        return new Result(CodeMsg.ACQUIRE_LIMITED);
     }
 
-//    @RequestMapping("/bucket")
-//    @ResponseBody
-//    public boolean bucket() {
-//        if (accessLimitService.budgetAcquire()) {
-//
-//        }
-//    }
+    @RequestMapping("/bucket")
+    @ResponseBody
+    public Result bucket() {
+        if (accessLimitService.budgetLimiterAcquire()) {
+            // (业务逻辑)
+            return new Result(CodeMsg.ACQUIRE_SUCCESS);
+        }
+        return new Result(CodeMsg.ACQUIRE_LIMITED);
+    }
 
 }
